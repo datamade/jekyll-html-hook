@@ -72,7 +72,7 @@ def execute(site_type, branch_name):
     
     run_scripts.delay(scripts, script_args)
 
-    resp = {'status', 'ok'}
+    resp = {'status': 'ok'}
     response = make_response(json.dumps(resp), 202)
     response.headers['Content-Type'] = 'application/json'
     return response
