@@ -1,0 +1,8 @@
+{
+    "scripts": {
+      "#default": {
+        "build": "./scripts/build-jekyll.sh",
+        "publish": "./scripts/publish-jekyll.sh"
+      }
+    }
+}

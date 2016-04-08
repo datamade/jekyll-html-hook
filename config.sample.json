@@ -1,13 +1,6 @@
 {
     "gh_server": "github.com",
     "temp": "/home/ubuntu/jekyll-hook",
-    "public_repo": true,
-    "scripts": {
-      "#default": {
-        "build": "./scripts/build.sh",
-        "publish": "./scripts/publish.sh"
-      }
-    },
     "secret": "",
     "email": {
         "isActivated": false,
@@ -17,6 +10,6 @@
         "ssl": true
     },
     "accounts": [
-        "developmentseed"
+        "datamade"
     ]
 }
