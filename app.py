@@ -64,10 +64,10 @@ def parsePost(post, branch):
 
 
 @app.route('/hooks/<site_type>/<branch_name>', methods=['POST'])
-def execute(site_type, branch):
+def execute(site_type, branch_name):
     post = request.get_json()
     
-    script_args = parsePost(post, branch)
+    script_args = parsePost(post, branch_name)
     scripts = app_config[site_type]
     
     run_scripts.delay(scripts, script_args)
