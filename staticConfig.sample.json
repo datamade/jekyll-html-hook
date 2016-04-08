@@ -1,8 +1,0 @@
-{
-    "scripts": {
-      "#default": {
-        "build": "./scripts/build-static.sh",
-        "publish": "./scripts/publish-static.sh"
-      }
-    }
-}
