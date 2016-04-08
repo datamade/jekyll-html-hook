@@ -10,7 +10,7 @@ var queue   = require('queue-async');
 var tasks   = queue(1);
 var spawn   = require('child_process').spawn;
 var email   = require('emailjs/email');
-var mailer  = email.server.connect(config.email);
+var mailer  = email.server.connect(globalConfig.email);
 var crypto  = require('crypto');
 
 app.use(express.bodyParser({
@@ -144,18 +144,24 @@ function runScripts(scripts, params, data){
 app.post('/hooks/jekyll/*', function(req, res) {
     // Close connection
     res.send(202);
-
-    // Queue request handler
-    tasks.defer(function(req, res, cb) {
-        var data = req.body;
-        var params = parsePost(req, data);
-
-        // Script by site type.
-        var scripts = getScripts(jekyllConfig, data);
-
-        runScripts(scripts, params, data);
-
-    }, req, res);
+    
+    if (typeof req.body.ref !== 'undefined') {
+    
+        // Queue request handler
+        tasks.defer(function(req, res, cb) {
+            var data = req.body;
+            var params = parsePost(req, data);
+ 
+            // Script by site type.
+            var scripts = getScripts(jekyllConfig, data);
+ 
+            runScripts(scripts, params, data);
+ 
+        }, req, res);
+    
+    } else {
+        console.log(req.body);
+    }
 
 });
 
@@ -164,17 +170,23 @@ app.post('/hooks/static/*', function(req, res) {
     // Close connection
     res.send(202);
 
-    // Queue request handler
-    tasks.defer(function(req, res, cb) {
-        var data = req.body;
-        var params = parsePost(req);
-
-        // Script by site type.
-        var scripts = getScripts(staticConfig, data);
-
-        runScripts(scripts, params, data);
-
-    }, req, res);
+    if (typeof req.body.ref !== 'undefined') {
+    
+        // Queue request handler
+        tasks.defer(function(req, res, cb) {
+            var data = req.body;
+            var params = parsePost(req, data);
+ 
+            // Script by site type.
+            var scripts = getScripts(staticConfig, data);
+ 
+            runScripts(scripts, params, data);
+ 
+        }, req, res);
+    
+    } else {
+        console.log(req.body);
+    }
 
 });
 
