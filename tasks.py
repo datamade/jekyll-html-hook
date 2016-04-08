@@ -1,6 +1,7 @@
 import pickle
 from redis import Redis
 import subprocess
+from uuid import uuid4
 
 from app_config import SENTRY_DSN, REDIS_QUEUE_KEY
 
