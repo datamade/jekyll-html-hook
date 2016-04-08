@@ -43,8 +43,8 @@ def run_scripts(scripts, args):
     build, publish = scripts
 
     try:
-        output = subprocess.check_output(build + args)
-        output = subprocess.check_output(publish + args)
+        output = subprocess.check_output([build] + args)
+        output = subprocess.check_output([publish] + args)
     except subprocess.CalledProcessError as e:
         sentry.captureException()
 
