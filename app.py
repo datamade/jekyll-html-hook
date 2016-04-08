@@ -68,7 +68,7 @@ def execute(site_type, branch_name):
     post = request.get_json()
     
     script_args = parsePost(post, branch_name)
-    scripts = app_config[site_type]
+    scripts = app_config.SCRIPTS[site_type]
     
     run_scripts.delay(scripts, script_args)
 
