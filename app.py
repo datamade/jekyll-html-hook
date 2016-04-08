@@ -26,7 +26,7 @@ def parsePost(post, branch):
     post['owner'] = post['repository']['owner']['name']
 
     # End early if not permitted account
-    if post['owner'] not in app_config['accounts']:
+    if post['owner'] not in app_config.ACCOUNTS:
         raise Exception('Account %s not permitted' % post['owner'])
 
     # End early if not permitted branch
@@ -64,10 +64,10 @@ def parsePost(post, branch):
 
 
 @app.route('/hooks/<site_type>/<branch_name>', methods=['POST'])
-def execute(site_type, branch_name):
+def execute(site_type, branch):
     post = request.get_json()
     
-    script_args = parsePost(post, branch_name)
+    script_args = parsePost(post, branch)
     scripts = app_config[site_type]
     
     run_scripts.delay(scripts, script_args)
