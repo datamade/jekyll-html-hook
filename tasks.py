@@ -21,7 +21,7 @@ class DelayedResult(object):
         if self._rv is None:
             rv = redis.get(self.key)
             if rv is not None:
-                self._rv = loads(rv)
+                self._rv = pickle.loads(rv)
         return self._rv
 
 def queuefunc(f):
@@ -52,7 +52,7 @@ def queue_daemon():
     print('Listening for work ... ')
     while 1:
         msg = redis.blpop(REDIS_QUEUE_KEY)
-        func, key, args, kwargs = loads(msg[1])
+        func, key, args, kwargs = pickle.loads(msg[1])
         
         try:
             rv = func(*args, **kwargs)
@@ -61,5 +61,5 @@ def queue_daemon():
             rv = e.message
         
         if rv is not None:
-            redis.set(key, dumps(rv))
+            redis.set(key, pickle.dumps(rv))
             redis.expire(key, rv_ttl)
