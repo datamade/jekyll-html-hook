@@ -44,6 +44,13 @@ def run_scripts(scripts, args):
 
     try:
         output = subprocess.check_output([build] + args)
+    except subprocess.CalledProcessError as e:
+        if e.returncode == 1:
+            sentry.captureException()
+        else:
+            pass
+
+    try:
         output = subprocess.check_output([publish] + args)
     except subprocess.CalledProcessError as e:
         if e.returncode == 1:
