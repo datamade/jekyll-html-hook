@@ -20,6 +20,9 @@ sentry = Sentry(app, dsn=app_config.SENTRY_DSN)
 
 def parsePost(post, branch):
     
+    if 'ref' not in post.keys():
+        return []
+
     # Parse webhook data for internal variables
     post['repo'] = post['repository']['name']
     post['branch'] = post['ref'].replace('refs/heads/', '')
@@ -68,9 +71,12 @@ def execute(site_type, branch_name):
     post = request.get_json()
     
     script_args = parsePost(post, branch_name)
-    scripts = app_config.SCRIPTS[site_type]
-    
-    run_scripts.delay(scripts, script_args)
+
+    if script_args:
+        
+        scripts = app_config.SCRIPTS[site_type]
+        
+        run_scripts.delay(scripts, script_args)
 
     resp = {'status': 'ok'}
     response = make_response(json.dumps(resp), 202)
