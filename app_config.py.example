@@ -3,7 +3,7 @@ TEMP = "/home/ubuntu/jekyll-hook"
 SECRET = ""
 
 SCRIPTS = {
-    'jekyll': ["./scripts/build-jekyll.sh" "./scripts/publish-jekyll.sh"],
+    'jekyll': ["./scripts/build-jekyll.sh", "./scripts/publish-jekyll.sh"],
     'static': ["./scripts/build-static.sh", "./scripts/publish-static.sh"],
 }
 
