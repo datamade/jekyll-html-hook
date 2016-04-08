@@ -45,18 +45,12 @@ def run_scripts(scripts, args):
     try:
         subprocess.check_call([build] + args)
     except subprocess.CalledProcessError as e:
-        if e.returncode == 1:
-            sentry.captureException()
-        else:
-            pass
+        sentry.captureException()
 
     try:
         subprocess.check_call([publish] + args)
     except subprocess.CalledProcessError as e:
-        if e.returncode == 1:
-            sentry.captureException()
-        else:
-            pass
+        sentry.captureException()
 
 def queue_daemon():
     print('Listening for work ... ')
