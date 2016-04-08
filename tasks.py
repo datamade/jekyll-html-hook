@@ -42,9 +42,9 @@ def queuefunc(f):
 def run_scripts(scripts, args):
     build, publish = scripts
 
-    subprocess.call([build] + args)
+    subprocess.check_call([build] + args)
 
-    subprocess.call([publish] + args)
+    subprocess.check_call([publish] + args)
 
 def queue_daemon():
     print('Listening for work ... ')
