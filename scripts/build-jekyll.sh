@@ -24,6 +24,6 @@ git pull origin $branch
 cd -
 
 # Run jekyll
-cd $source
-/home/ubuntu/.rvm/gems/ruby-2.3.0/bin/jekyll build -s $source -d $build
-cd -
+#cd $source
+#/home/ubuntu/.rvm/gems/ruby-2.3.0/bin/jekyll build -s $source -d $build
+#cd -
