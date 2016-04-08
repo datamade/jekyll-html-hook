@@ -76,7 +76,7 @@ def execute(site_type, branch_name):
         
         scripts = app_config.SCRIPTS[site_type]
         
-        run_scripts.delay(scripts, script_args)
+        run_scripts(scripts, script_args)
 
     resp = {'status': 'ok'}
     response = make_response(json.dumps(resp), 202)
