@@ -1,0 +1,19 @@
+[program:static-sites]
+stdout_logfile=/tmp/static-sites-gunicorn-out.log
+stdout_logfile_maxbytes=10MB
+stderr_logfile=/tmp/static-sites-gunicorn-err.log
+stderr_logfile_maxbytes=10MB
+directory=/home/ubuntu/jekyll-hook
+process_name=static-sites
+user=ubuntu
+command=/home/ubuntu/.virtualenvs/jekyll-hook/bin/gunicorn --log-level info -b 127.0.0.1:5003 app:app
+
+[program:static-sites-worker]
+stdout_logfile=/tmp/static-sites-worker-out.log
+stdout_logfile_maxbytes=10MB
+stderr_logfile=/tmp/static-sites-worker-err.log
+stderr_logfile_maxbytes=10MB
+directory=/home/ubuntu/jekyll-hook
+process_name=static-sites-worker
+user=ubuntu
+command=/home/ubuntu/.virtualenvs/jekyll-hook/bin/python worker.py

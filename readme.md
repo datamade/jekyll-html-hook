@@ -1,160 +1,128 @@
 # jekyll-hook
 
 A server that listens for webhook posts from GitHub, generates a website with
-Jekyll, and moves it somewhere to be published. Use this to run your own GitHub
-Pages-style web server. Great for when you need to serve your websites behind a
-firewall, need extra server-level features like HTTP basic auth (see below for an
-NGINX config with basic auth), or want to host your site directly on a CDN or
-file host like S3. It's cutomizable with two user-configurable shell scripts
-and a config file.
-
-*This guide is tested on Ubuntu 14.0*
+Jekyll, or just copies files in the case of a static HTML site and moves it
+somewhere to be published. Use this to run your own GitHub Pages-style web
+server. Great for when you need to serve your websites behind a firewall, need
+extra server-level features like HTTPS for your domain or HTTP basic auth. It's
+cutomizable with a config file. The original concept for this is heavily
+influenced by [Development Seed's NodeJS based
+project](https://github.com/developmentseed/jekyll-hook) with the same name.
 
 ## Dependencies Installation
 
 First install main dependencies
 
-    $: sudo apt-get update
-    $: sudo apt-get install git nodejs ruby ruby1.9.1-dev npm
+    sudo apt-get update
+    sudo apt-get install git python3.4-dev ruby ruby1.9.1-dev redis-server nginx
 
-Symlink nodejs to node
+We also need Jekyll
 
-    $: sudo ln -s /usr/bin/nodejs /usr/bin/node
-
-To keep server running we use Forever:
-
-    $: sudo npm install -g forever
-
-We also need Jekyll and Nginx
-
-    $: sudo gem install jekyll rdiscount json
-    $: sudo apt-get install nginx
+    sudo gem install jekyll rdiscount json
 
 ## Installation
 
-Clone the repo
+We recommend using
+[virtualenv](http://virtualenv.readthedocs.org/en/latest/virtualenv.html) and
+[virtualenvwrapper](http://virtualenvwrapper.readthedocs.org/en/latest/install.html)
+for working in a virtualized development environment. [Read how to set up
+virtualenv](http://docs.python-guide.org/en/latest/dev/virtualenvs/). One thing
+to remember is that this app requires at least Python 3.4.
 
-    $: git clone https://github.com/developmentseed/jekyll-hook.git
+Once you have virtualenvwrapper set up,
 
-Install dependencies:
+    mkvirtualenv jekyll-hook
+    git clone https://github.com/datamade/jekyll-hook.git
+    cd jekyll-hook
+    pip install -r requirements.txt
 
-    $: cd jekyll-hook
-    jekyll-hook $: npm install
+Afterwards, whenever you want to work on jekyll-hook,
 
-If you receive an error similar to this `npm ERR! Error: EACCES, mkdir
-'/home/ubuntu/tmp/npm-2223-4myn3niN'` run:
-
-    $: sudo chown -R ubuntu:ubuntu /home/ubuntu/tmp
-    $: npm install
-
-*You should replace `ubuntu` with your username*
+    workon jekyll-hook
 
 ## Configuration
 
 Copy `config.sample.json` to `config.json` in the root directory and customize:
 
-    $: cp config.sample.json config.json
-    $: vim config.json
+    cp app_config.py.example app_config.py
+    vim app_config.py
 
 Configuration attributes:
 
-- `gh_server` The GitHub server from which to pull code, e.g. github.com
-- `temp` A directory to store code and site files
-- `public-repo` Whether the repo is public or private (default is public)
-- `scripts`
-    - `[branch-name]` (optional)
-        - `build` The build script to run for a specific branch.
-        - `publish` The publish script to run for a specific branch.
-    - `#default`
-        - `build` The build script to run if no match was found for the branch specified in the webhook.
-        - `publish` The publish script to run if match was found for the branch specified in the webhook.
-- `secret` Optional. GitHub webhook secret.
-- `email` Optional. Settings for sending email alerts
-    - `isActivated` If set to true email will be sent after each trigger
-    - `user` Sending email account's user name (e.g. `example@gmail.com`)
-    - `password` Sending email account's password
-    - `host` SMTP host for sending email account (e.g. `smtp.gmail.com`)
-    - `ssl` `true` or `false` for SSL
-- `accounts` An array of accounts or organizations whose repositories can be used
-with this server
+- `GH_SERVER` The GitHub server from which to pull code, e.g. github.com
+- `TEMP` A directory to store code and site files
+- `SECRET` Optional. GitHub webhook secret.
+- `SCRIPTS` A dictionary where the keys are the names of the kinds of sites you
+have (by default this app can handle generating a Jekyll site or just handle
+static HTML) and the values are the relative paths to the scripts that
+are used to build and/or deploy those sites.
+- `ACCOUNTS` A list of organizations whose repositories can be used with this
+server.
+- `SENTRY_DSN` Optional. DSN to configure [Sentry logging](https://getsentry.com).
+- `REDIS_QUEUE_KEY` A unique string used to identify messages in Redis that the
+app should pay attention to.
 
-You can also adjust `build.sh` and `publish.sh` to suit your workflow. By default,
-they generate a site with Jekyll and publish it to an NGINX web directory.
+You can also adjust the default scripts in the `scripts` directory to suit your
+workflow. By default, they generate a site with Jekyll or just copy static HTML
+files and publish it to an NGINX web directory.
 
 ## Webhook Setup on Github
 
-Set a [Web hook](https://developer.github.com/webhooks/) on your GitHub repository
-that points to your jekyll-hook server `http://example.com:8080/hooks/jekyll/:branch`, where `:branch` is the branch you want to publish. Usually this is `gh-pages` or `master` for `*.github.com` / `*.github.io` repositories.
+Set a [Web hook](https://developer.github.com/webhooks/) on your GitHub
+repository that points to your jekyll-hook server
+`https://example.com/hooks/:site_type/:branch`, where `:site_type` one of the
+site types you configured in the `SCRIPTS` variable above (by default either
+`jekyll` or `static`) `:branch` is the branch you want to publish. So,
+for example, if you'd like to configure a webhook for a Jekyll site and
+only deploy when you push to the `deploy` branch, your webhook URL would
+look like this:
 
-For every branch you want to build/publish (as defined in the `scripts`) you need to set up a different webhook.
+    https://example.com/hooks/jekyll/deploy
 
 ## Configure a webserver (nginx)
 
-The default `publish.sh` is setup for nginx and copies `_site` folder to `/usr/share/nginx/html/rep_name`.
+The default `publish.sh` is setup for nginx and copies the generated (or
+static) HTML to `/usr/share/nginx/html/<repo_name>`.
 
 If you would like to copy the website to another location, make sure to update
 nginx virtual hosts which is located at `/etc/nginx/nginx/site-available` on Ubuntu 14.
 
 You also need to update `publish.sh`
 
-For more information Google or [read this](https://www.digitalocean.com/community/tutorials/how-to-configure-the-nginx-web-server-on-a-virtual-private-server):
+An example Nginx configuration (complete with Gzip and SSL/TLS settings based
+upon using [Let's Encryt](https://letsencrypt.org/)) [is in the `scripts` folder](https://github.com/datamade/jekyll-hook/blob/master/scripts/nginx_template.conf)
 
-## Launch
+## Run the app
 
-    $: ./jekyll-hook.js
+There are two processes, one to handle incoming webhooks and one to actually generate and/or deploy the site. 
 
-To launch in background run:
+    python app.py
+    python worker.py
 
-    $: forever start jekyll-hook.js
+As an an example of how you might daemonize the app and worker, an example
+Supervisor configuration file [is in the `scripts` folder](https://github.com/datamade/jekyll-hook/blob/master/scripts/supervisor_conf.example).
 
-To kill or restart the background job:
-
-```
-    $: forever list
-    info:    Forever processes running
-    data:        uid  command         script         forever pid  logfile                        uptime
-    data:    [0] ZQMF /usr/bin/nodejs jekyll-hook.js 4166    4168 /home/ubuntu/.forever/ZQMF.log 0:0:1:22.176
-    $: forever stop 0
-```
-
-## Publishing content
-
-### S3
-
-To publish the site on Amazon S3, you need to install S3cmd. On Ubuntu run:
-
-    $: sudo apt-get install s3cmd
-    $: s3cmd --configure
-
-For more information [read this](http://xmodulo.com/2013/06/how-to-access-amazon-s3-cloud-storage-from-command-line-in-linux.html).
-
-`scripts/publish-s3.sh` does the rest of the job for you. Just make sure to add your bucket name there.
-
-### More details on build.sh
-
-The stock `build.sh` copies rendered site files to subdirectories under a web server's `www` root directory. For instance, use this script and NGINX with the following configuration file to serve static content behind HTTP basic authentication:
-
-```
-server {
-    root /usr/share/nginx/www;
-    index index.html index.htm;
-
-    # Make site accessible from http://localhost/
-    server_name localhost;
-
-    location / {
-        # First attempt to serve request as file, then
-        # as directory, then fall back to index.html
-        try_files $uri $uri/ /index.html;
-
-        # Optional basic auth restriction
-        # auth_basic "Restricted";
-        # auth_basic_user_file /etc/nginx/.htpasswd;
-    }
-}
-```
-
-Replace this script with whatever you need for your particular hosting environment.
+## Other random stuff
 
 You probably want to configure your server to only respond POST requests from GitHub's
 public IP addresses, found on the webhooks settings page.
+
+## Team
+
+* Eric van Zanten - developer
+* Derek Eder - developer
+
+## Errors / Bugs
+
+If something is not behaving intuitively, it is a bug, and should be reported.
+Report it here: https://github.com/datamade/jekyll-hook/issues
+
+## Note on Patches/Pull Requests
+ 
+* Fork the project.
+* Make your feature addition or bug fix.
+* Send a pull request. Bonus points for topic branches.
+
+## Copyright
+
+Copyright (c) 2016 DataMade. Released under the [MIT License](https://github.com/datamade/jekyll-hook/blob/master/LICENSE).
