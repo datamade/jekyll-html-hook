@@ -129,4 +129,4 @@ Report it here: https://github.com/datamade/jekyll-html-hook/issues
 
 ## Copyright
 
-Copyright (c) 2016 DataMade. Released under the [MIT License](https://github.com/datamade/jekyll-hook/blob/master/LICENSE).
+Copyright (c) 2016 DataMade. Released under the [MIT License](https://github.com/datamade/jekyll-html-hook/blob/master/LICENSE).
