@@ -1,13 +1,17 @@
-# jekyll-hook
+# jekyll-html-hook
 
 A server that listens for webhook posts from GitHub, generates a website with
 Jekyll, or just copies files in the case of a static HTML site and moves it
-somewhere to be published. Use this to run your own GitHub Pages-style web
+somewhere to be published. 
+
+Use this to run your own GitHub Pages-style web
 server. Great for when you need to serve your websites behind a firewall, need
 extra server-level features like HTTPS for your domain or HTTP basic auth. It's
-cutomizable with a config file. The original concept for this is heavily
-influenced by [Development Seed's NodeJS based
-project](https://github.com/developmentseed/jekyll-hook) with the same name.
+cutomizable with a config file. 
+
+The original concept for this is heavily
+influenced by Development Seed's NodeJS based
+project, [jekyll-hook](https://github.com/developmentseed/jekyll-hook).
 
 ## Dependencies Installation
 
@@ -31,14 +35,14 @@ to remember is that this app requires at least Python 3.4.
 
 Once you have virtualenvwrapper set up,
 
-    mkvirtualenv jekyll-hook
-    git clone https://github.com/datamade/jekyll-hook.git
-    cd jekyll-hook
+    mkvirtualenv jekyll-html-hook
+    git clone https://github.com/datamade/jekyll-html-hook.git
+    cd jekyll-html-hook
     pip install -r requirements.txt
 
-Afterwards, whenever you want to work on jekyll-hook,
+Afterwards, whenever you want to work on jekyll-html-hook,
 
-    workon jekyll-hook
+    workon jekyll-html-hook
 
 ## Configuration
 
@@ -69,7 +73,7 @@ files and publish it to an NGINX web directory.
 ## Webhook Setup on Github
 
 Set a [Web hook](https://developer.github.com/webhooks/) on your GitHub
-repository that points to your jekyll-hook server
+repository that points to your jekyll-html-hook server
 `https://example.com/hooks/:site_type/:branch`, where `:site_type` one of the
 site types you configured in the `SCRIPTS` variable above (by default either
 `jekyll` or `static`) `:branch` is the branch you want to publish. So,
@@ -90,7 +94,7 @@ nginx virtual hosts which is located at `/etc/nginx/nginx/site-available` on Ubu
 You also need to update `publish.sh`
 
 An example Nginx configuration (complete with Gzip and SSL/TLS settings based
-upon using [Let's Encryt](https://letsencrypt.org/)) [is in the `scripts` folder](https://github.com/datamade/jekyll-hook/blob/master/scripts/nginx_template.conf)
+upon using [Let's Encryt](https://letsencrypt.org/)) [is in the `scripts` folder](https://github.com/datamade/jekyll-html-hook/blob/master/scripts/nginx_template.conf)
 
 ## Run the app
 
@@ -100,7 +104,7 @@ There are two processes, one to handle incoming webhooks and one to actually gen
     python worker.py
 
 As an an example of how you might daemonize the app and worker, an example
-Supervisor configuration file [is in the `scripts` folder](https://github.com/datamade/jekyll-hook/blob/master/scripts/supervisor_conf.example).
+Supervisor configuration file [is in the `scripts` folder](https://github.com/datamade/jekyll-html-hook/blob/master/scripts/supervisor_conf.example).
 
 ## Other random stuff
 
@@ -115,7 +119,7 @@ public IP addresses, found on the webhooks settings page.
 ## Errors / Bugs
 
 If something is not behaving intuitively, it is a bug, and should be reported.
-Report it here: https://github.com/datamade/jekyll-hook/issues
+Report it here: https://github.com/datamade/jekyll-html-hook/issues
 
 ## Note on Patches/Pull Requests
  
@@ -125,4 +129,4 @@ Report it here: https://github.com/datamade/jekyll-hook/issues
 
 ## Copyright
 
-Copyright (c) 2016 DataMade. Released under the [MIT License](https://github.com/datamade/jekyll-hook/blob/master/LICENSE).
+Copyright (c) 2016 DataMade. Released under the [MIT License](https://github.com/datamade/jekyll-html-hook/blob/master/LICENSE).
