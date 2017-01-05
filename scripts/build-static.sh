@@ -19,7 +19,7 @@ fi
 
 # Git checkout appropriate branch, pull latest code
 cd $source
-git checkout $branch
-git pull origin $branch
+git fetch --all
+git reset --hard origin/$branch
 cd -
 
