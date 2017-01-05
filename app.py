@@ -82,6 +82,7 @@ def execute(site_type, branch_name):
     try:
         script_args = parsePost(post, branch_name)
     except PayloadException as e:
+        script_args = None
         resp['status'] = e.message
 
     if script_args:
