@@ -18,6 +18,13 @@ sentry = Sentry(app, dsn=app_config.SENTRY_DSN)
 # expects GeoJSON object as a string
 # client will need to use JSON.stringify() or similar
 
+class PayloadException(Exception):
+    def __init__(self, message):
+        
+        super().__init__()
+        
+        self.message = message
+
 def parsePost(post, branch):
     
     if 'ref' not in post.keys():
@@ -30,11 +37,11 @@ def parsePost(post, branch):
 
     # End early if not permitted account
     if post['owner'] not in app_config.ACCOUNTS:
-        raise Exception('Account %s not permitted' % post['owner'])
+        raise PayloadException('Account %s not permitted' % post['owner'])
 
     # End early if not permitted branch
     if post['branch'] != branch:
-        raise Exception('Branch %s not permitted' % post['branch'])
+        raise PayloadException('Branch %s not permitted' % post['branch'])
 
     giturl = 'git@{server}:{owner}/{repo}.git'\
                  .format(server=app_config.GH_SERVER,
@@ -70,7 +77,12 @@ def parsePost(post, branch):
 def execute(site_type, branch_name):
     post = request.get_json()
     
-    script_args = parsePost(post, branch_name)
+    resp = {'status': 'ok'}
+    
+    try:
+        script_args = parsePost(post, branch_name)
+    except PayloadException as e:
+        resp['status'] = e.message
 
     if script_args:
         
@@ -78,7 +90,6 @@ def execute(site_type, branch_name):
         
         run_scripts.delay(scripts, script_args)
 
-    resp = {'status': 'ok'}
     response = make_response(json.dumps(resp), 202)
     response.headers['Content-Type'] = 'application/json'
     return response
