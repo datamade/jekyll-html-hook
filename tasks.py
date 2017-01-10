@@ -45,13 +45,13 @@ def run_scripts(scripts, args):
     try:
         subprocess.check_call([build] + args)
     except subprocess.CalledProcessError as e:
-        print(e)
+        print('EXCEPTION', e)
         sentry.captureException()
 
     try:
         subprocess.check_call([publish] + args)
     except subprocess.CalledProcessError as e:
-        print(e)
+        print('EXCEPTION', e)
         sentry.captureException()
 
 def queue_daemon():
