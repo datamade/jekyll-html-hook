@@ -32,7 +32,7 @@ if [ ! -d $source ]; then
     
     sudo service nginx restart
     
-    sudo $HOME/letsencrypt/letsencrypt-auto certonly --non-interactive -v --webroot -w /usr/share/nginx/html -d $hostname
+    sudo $HOME/letsencrypt/letsencrypt-auto certonly -q --webroot -w /usr/share/nginx/html/$repo -d $hostname
     
     sudo $venv_bin_dir/python write_nginx_conf.py $hostname $source $part2
     
