@@ -35,7 +35,7 @@ def parsePost(post, branch):
     # Parse webhook data for internal variables
     post['repo'] = post['repository']['name']
     post['branch'] = post['ref'].replace('refs/heads/', '')
-    post['owner'] = post['repository']['owner']['login']
+    post['owner'] = post['repository']['owner']['name']
 
     # End early if not permitted account
     if post['owner'] not in app_config.ACCOUNTS:
