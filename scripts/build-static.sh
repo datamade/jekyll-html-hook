@@ -25,6 +25,8 @@ if [ ! -d $source ]; then
     
     sudo mkdir /usr/share/nginx/html/$repo
     sudo mkdir /usr/share/nginx/html/$repo/.well-known
+    
+    sudo chown -R root.www-data /usr/share/nginx/html/$repo
 
     sudo $venv_bin_dir/python $scripts_dir/write_nginx_conf.py $hostname $repo $part1
     
