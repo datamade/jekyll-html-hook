@@ -19,7 +19,7 @@ if [ ! -d $source ]; then
     
     hostname=`cat $source/CNAME`
     
-    scripts_dir=`pwd`
+    scripts_dir=`pwd`/scripts
     part1=$scripts_dir/nginx_conf_part_1.conf
     part2=$scripts_dir/nginx_conf_part_2.conf
     
