@@ -5,11 +5,7 @@ if __name__ == "__main__":
 
     from jinja2 import Template
     
-    hostname, source, template_path = sys.argv[1:]
-    
-    print(hostname, source, template_path)
-
-    appname = os.path.basename(source)
+    hostname, appname, template_path = sys.argv[1:]
     
     outpath = '/etc/nginx/conf.d/'
     
