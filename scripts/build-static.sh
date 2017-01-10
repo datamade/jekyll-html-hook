@@ -23,6 +23,8 @@ if [ ! -d $source ]; then
     part1=$scripts_dir/nginx_conf_part_1.conf
     part2=$scripts_dir/nginx_conf_part_2.conf
     
+    sudo mkdir /usr/share/nginx/html/$repo
+
     sudo $venv_bin_dir/python $scripts_dir/write_nginx_conf.py $hostname $repo $part1
     
     sudo service nginx restart
