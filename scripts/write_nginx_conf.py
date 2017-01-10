@@ -7,6 +7,8 @@ if __name__ == "__main__":
     
     hostname, source, template_path = sys.argv[1:]
     
+    print(hostname, source, template_path)
+
     appname = os.path.basename(source)
     
     outpath = '/etc/nginx/conf.d/'
