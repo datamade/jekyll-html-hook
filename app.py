@@ -1,6 +1,8 @@
 import os
 from datetime import datetime, timedelta
 import json
+import urllib.request
+import sys
 
 from flask import Flask, request, make_response
 from raven.contrib.flask import Sentry
@@ -61,6 +63,17 @@ def parsePost(post, branch):
                         repo=post['repo'],
                         branch=post['branch'])
     
+    cname_url = 'https://api.github.com/repos/{owner}/{repo}/contents/CNAME?access_token={token}'
+    cname_url = cname_url.format(owner=post['owner'],
+                                 repo=post['repo'],
+                                 token=app_config.GH_TOKEN)
+
+    with urllib.request.urlopen(cname_url) as cname:
+        if cname.status != 200:
+            raise PayloadException('CNAME file does not seem to exist in repo')
+    
+    venv_bin_dir = os.path.dirname(sys.executable)
+
     script_args = [
         post['repo'],
         post['branch'],
@@ -68,10 +81,10 @@ def parsePost(post, branch):
         giturl,
         source,
         build,
+        venv_bin_dir,
     ]
 
     return script_args
-
 
 @app.route('/hooks/<site_type>/<branch_name>', methods=['POST'])
 def execute(site_type, branch_name):

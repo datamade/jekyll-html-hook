@@ -1,4 +1,5 @@
 GH_SERVER = "github.com"
+GH_TOKEN = ''
 TEMP = "/home/ubuntu/jekyll-hook"
 SECRET = ""
 
