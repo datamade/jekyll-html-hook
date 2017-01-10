@@ -11,6 +11,7 @@ owner=$3
 giturl=$4
 source=$5
 build=$6
+$venv_bin_dir=$7
 
 # Check to see if repo exists. If not, git clone it
 if [ ! -d $source ]; then
