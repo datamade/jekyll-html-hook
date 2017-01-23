@@ -26,7 +26,7 @@ if [ ! -d $source ]; then
     
     sudo service nginx reload
     
-    sudo $HOME/letsencrypt/letsencrypt-auto certonly -q --webroot -w /usr/share/nginx/html/$repo -d $hostname
+    sudo ../letsencrypt/letsencrypt-auto certonly -q --webroot -w /usr/share/nginx/html/$repo -d $hostname
     
     sudo $venv_bin_dir/python $scripts_dir/write_nginx_conf.py $hostname $repo $part2
     
