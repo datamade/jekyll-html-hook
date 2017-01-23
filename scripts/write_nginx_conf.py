@@ -5,11 +5,13 @@ if __name__ == "__main__":
 
     from jinja2 import Template
     
-    hostname, appname, template_path = sys.argv[1:]
+    hostname, code_dir, template_path = sys.argv[1:]
     
     outpath = '/etc/nginx/conf.d/'
     
-    conf_name = '{0}/{1}.conf'.format(outpath, appname)
+    conf_name = '{0}/{1}.conf'.format(outpath, hostname)
+    
+    appname = code_dir.rsplit('/', 3)[-3]
 
     with open(template_path) as f:
         conf_part_1 = Template(f.read())
