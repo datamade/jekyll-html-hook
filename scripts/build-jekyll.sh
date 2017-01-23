@@ -26,7 +26,7 @@ if [ ! -d $source ]; then
     
     sudo $HOME/letsencrypt/letsencrypt-auto certonly -q --webroot -w /usr/share/nginx/html -d $hostname
     
-    sudo $venv_bin_dir/python write_nginx_conf.py $hostname $source $part2
+    sudo $venv_bin_dir/python $scripts_dir/write_nginx_conf.py $hostname $source $part2
     
     sudo service nginx restart
 fi
