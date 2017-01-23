@@ -73,7 +73,9 @@ def parsePost(post, branch):
             raise PayloadException('CNAME file does not seem to exist in repo')
     
     venv_bin_dir = os.path.dirname(sys.executable)
-
+    
+    appname = source.rsplit('/', 3)[-3]
+    
     script_args = [
         post['repo'],
         post['branch'],
@@ -82,6 +84,7 @@ def parsePost(post, branch):
         source,
         build,
         venv_bin_dir,
+        appname,
     ]
 
     return script_args

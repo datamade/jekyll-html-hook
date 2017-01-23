@@ -12,29 +12,26 @@ giturl=$4
 source=$5
 build=$6
 venv_bin_dir=$7
+appname=$8
 
 # Check to see if repo exists. If not, git clone it
+# and run nginx setup
 if [ ! -d $source ]; then
     git clone $giturl $source
     
     hostname=`cat $source/CNAME`
     
-    scripts_dir=`pwd`/scripts
+    scripts_dir=`pwd`
     part1=$scripts_dir/nginx_conf_part_1.conf
     part2=$scripts_dir/nginx_conf_part_2.conf
     
-    sudo mkdir /usr/share/nginx/html/$repo
-    sudo mkdir /usr/share/nginx/html/$repo/.well-known
+    sudo $venv_bin_dir/python $scripts_dir/write_nginx_conf.py $hostname $appname $part1
     
-    sudo chown -R root.www-data /usr/share/nginx/html/$repo
-
-    sudo $venv_bin_dir/python $scripts_dir/write_nginx_conf.py $hostname $repo $part1
+    sudo service nginx reload
     
-    sudo service nginx restart
+    sudo $HOME/letsencrypt/letsencrypt-auto certonly -q --webroot -w /usr/share/nginx/html/$appname -d $hostname
     
-    sudo $HOME/letsencrypt/letsencrypt-auto certonly -q --webroot -w /usr/share/nginx/html/$repo -d $hostname
-    
-    sudo $venv_bin_dir/python $scripts_dir/write_nginx_conf.py $hostname $repo $part2
+    sudo $venv_bin_dir/python $scripts_dir/write_nginx_conf.py $hostname $appname $part2
     
     sudo service nginx restart
 fi
