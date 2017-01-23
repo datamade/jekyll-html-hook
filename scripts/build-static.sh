@@ -12,7 +12,6 @@ giturl=$4
 source=$5
 build=$6
 venv_bin_dir=$7
-appname=$8
 
 # Check to see if repo exists. If not, git clone it
 # and run nginx setup
@@ -21,7 +20,7 @@ if [ ! -d $source ]; then
     
     hostname=`cat $source/CNAME`
     
-    scripts_dir=`pwd`
+    scripts_dir=`pwd`/scripts
     part1=$scripts_dir/nginx_conf_part_1.conf
     part2=$scripts_dir/nginx_conf_part_2.conf
     
