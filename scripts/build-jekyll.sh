@@ -21,13 +21,15 @@ if [ ! -d $source ]; then
     part1=$scripts_dir/nginx_conf_part_1.conf
     part2=$scripts_dir/nginx_conf_part_2.conf
     
-    sudo $venv_bin_dir/python $scripts_dir/write_nginx_conf.py $hostname $appname $part1
+    echo "$venv_bin_dir/python $scripts_dir/write_nginx_conf.py $hostname $repo $part1"
+    
+    sudo $venv_bin_dir/python $scripts_dir/write_nginx_conf.py $hostname $repo $part1
     
     sudo service nginx reload
     
-    sudo $HOME/letsencrypt/letsencrypt-auto certonly -q --webroot -w /usr/share/nginx/html/$appname -d $hostname
+    sudo $HOME/letsencrypt/letsencrypt-auto certonly -q --webroot -w /usr/share/nginx/html/$repo -d $hostname
     
-    sudo $venv_bin_dir/python $scripts_dir/write_nginx_conf.py $hostname $appname $part2
+    sudo $venv_bin_dir/python $scripts_dir/write_nginx_conf.py $hostname $repo $part2
     
     sudo service nginx restart
 fi
