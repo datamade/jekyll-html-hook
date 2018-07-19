@@ -74,12 +74,14 @@ def parsePost(post, branch):
 
     # End early if not permitted account
     if post['owner'] not in app_config.ACCOUNTS:
-        raise PayloadException('Account %s not permitted' % post['owner'])
+        raise PayloadException('Account {user} not permitted'.format(user=post['owner']),
+                               status_code=403)
 
     # End early if not permitted branch
 
     if post['branch'] != branch:
-        raise PayloadException('Branch %s not permitted' % post['branch'])
+        raise PayloadException('Branch {branch} not permitted'.format(branch=post['branch']),
+                               status_code=403)
 
     giturl = 'git@{server}:{owner}/{repo}.git'\
                  .format(server=app_config.GH_SERVER,
