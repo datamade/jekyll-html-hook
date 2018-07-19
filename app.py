@@ -4,7 +4,7 @@ import json
 import urllib.request
 import sys
 
-from flask import Flask, request, make_response
+from flask import Flask, request, make_response, jsonify, abort
 from raven.contrib.flask import Sentry
 import app_config
 
@@ -20,15 +20,50 @@ sentry = Sentry(app, dsn=app_config.SENTRY_DSN)
 # expects GeoJSON object as a string
 # client will need to use JSON.stringify() or similar
 
-class PayloadException(Exception):
-    def __init__(self, message):
-        
-        super().__init__()
-        
+def json_abort(message, code):
+    abort(make_response(jsonify(error=message), code))
+    
+
+#class PayloadException(Exception):
+#    def __init__(self, message):
+#        
+#        super().__init__()
+#        
+#        self.message = message
+
+class AppError(Exception):
+
+    def __init__(self, message, status_code=None, payload=None):
+        Exception.__init__(self)
         self.message = message
+        if status_code is not None:
+            self.status_code = status_code
+        self.payload = payload
+
+    def to_dict(self):
+        rv = dict(self.payload or ())
+        rv['message'] = self.message
+        return rv
+
+class InvalidUsage(AppError):
+    status_code = 400
+    pass
+
+class ServerError(AppError):
+    status_code = 500
+    pass
+
+class PayloadException(InvalidUsage):
+    pass
+
+@app.errorhandler(AppError)
+def handle_payload_exception(error):
+    response = jsonify(error.to_dict())
+    response.status_code = error.status_code
+    return response
 
 def parsePost(post, branch):
-    
+
     if 'ref' not in post.keys():
         return []
 
@@ -42,6 +77,7 @@ def parsePost(post, branch):
         raise PayloadException('Account %s not permitted' % post['owner'])
 
     # End early if not permitted branch
+
     if post['branch'] != branch:
         raise PayloadException('Branch %s not permitted' % post['branch'])
 
@@ -68,9 +104,11 @@ def parsePost(post, branch):
                                  repo=post['repo'],
                                  token=app_config.GH_TOKEN)
 
-    with urllib.request.urlopen(cname_url) as cname:
-        if cname.status != 200:
-            raise PayloadException('CNAME file does not seem to exist in repo')
+    try:
+        urllib.request.urlopen(cname_url)
+    except urllib.error.HTTPError as e:
+        raise PayloadException('{url}: {reason}'.format(url=cname_url, reason=e.reason),
+                               status_code=e.code)
     
     venv_bin_dir = os.path.dirname(sys.executable)
     
@@ -89,14 +127,15 @@ def parsePost(post, branch):
 @app.route('/hooks/<site_type>/<branch_name>', methods=['POST'])
 def execute(site_type, branch_name):
     post = request.get_json()
-    
+
+    content_type = request.headers.get('Content-Type')
+
+    if content_type != 'application/json':
+        raise ServerError('handling {content_type} is not implemented'.format(content_type=content_type), status_code=501)
+        
     resp = {'status': 'ok'}
     
-    try:
-        script_args = parsePost(post, branch_name)
-    except PayloadException as e:
-        script_args = None
-        resp['status'] = e.message
+    script_args = parsePost(post, branch_name)
 
     if script_args:
         
