@@ -4,7 +4,7 @@ import json
 import urllib.request
 import sys
 
-from flask import Flask, request, make_response, jsonify, abort
+from flask import Flask, request, make_response, jsonify
 from raven.contrib.flask import Sentry
 import app_config
 
@@ -19,17 +19,6 @@ sentry = Sentry(app, dsn=app_config.SENTRY_DSN)
 
 # expects GeoJSON object as a string
 # client will need to use JSON.stringify() or similar
-
-def json_abort(message, code):
-    abort(make_response(jsonify(error=message), code))
-    
-
-#class PayloadException(Exception):
-#    def __init__(self, message):
-#        
-#        super().__init__()
-#        
-#        self.message = message
 
 class AppError(Exception):
 
