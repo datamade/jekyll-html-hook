@@ -130,9 +130,13 @@ def execute(site_type, branch_name):
 
     if script_args:
         
-        scripts = app_config.SCRIPTS[site_type]
-        
-        run_scripts.delay(scripts, script_args)
+        try:
+            scripts = app_config.SCRIPTS[site_type]
+        except KeyError:
+            raise ServerError("No script file defined for '{0}' in config.".format(site_type),
+                        status_code=501)
+        else:
+            run_scripts.delay(scripts, script_args)
 
     response = make_response(json.dumps(resp), 202)
     response.headers['Content-Type'] = 'application/json'
